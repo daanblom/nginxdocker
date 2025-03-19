@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  webserver:
+    build: .
+    container_name: nginx_ssl
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./www:/var/www/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    environment:
+      - DOMAIN=example.com  # Replace with your domain
+      - EMAIL=your-email@example.com  # Replace with your email
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge 
