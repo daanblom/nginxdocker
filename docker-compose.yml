@@ -13,8 +13,8 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     environment:
-      - DOMAIN=db-pixel.club  # Replace with your domain
-      - EMAIL=contact@daanblom.com # Replace with your email
+      - DOMAIN=example.com  # Replace with your domain
+      - EMAIL=contact@example.com # Replace with your email
     command: "/bin/sh -c ./start.sh"
     networks:
       - web
