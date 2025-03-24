@@ -10,13 +10,12 @@ services:
       - "443:443"
     volumes:
       - ./www:/var/www/html
-      - ./nginx/conf.d:/etc/nginx/conf.d
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     environment:
-      - DOMAIN=example.com  # Replace with your domain
-      - EMAIL=your-email@example.com  # Replace with your email
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+      - DOMAIN=db-pixel.club  # Replace with your domain
+      - EMAIL=contact@daanblom.com # Replace with your email
+    command: "/bin/sh -c ./start.sh"
     networks:
       - web
 

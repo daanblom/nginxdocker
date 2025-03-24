@@ -4,8 +4,10 @@ This is a Docker-based setup for a secure Nginx web server with SSL support usin
 
 ## Features
 
-- Lightweight Nginx server based on Alpine Linux
+- Lightweight Nginx server based on Debian Bullseye
+- Dynamic Nginx configuration generation
 - Automatic SSL certificate management with Let's Encrypt
+- Daily automatic certificate renewal via cron
 - Modern SSL configuration with strong security headers
 - HTTP/2 support
 - Gzip compression with optimal settings
@@ -13,10 +15,9 @@ This is a Docker-based setup for a secure Nginx web server with SSL support usin
 - Comprehensive static file caching
 - Rate limiting and request size restrictions
 - Fine-tuned timeout settings
-- Security headers including HSTS, CSP, and Permissions-Policy
+- Security headers including HSTS
 - Hidden file access protection
 - Health checks
-- Automatic Nginx reload every 6 hours
 
 ## Prerequisites
 
@@ -29,12 +30,12 @@ This is a Docker-based setup for a secure Nginx web server with SSL support usin
 1. Clone this repository
 2. Create the required directories:
    ```bash
-   mkdir -p www nginx/conf.d certbot/conf certbot/www
+   mkdir -p www certbot/conf certbot/www
    ```
 
-3. Update the configuration:
-   - Edit `nginx/conf.d/app.conf` and replace `example.com` with your domain
-   - Edit `docker-compose.yml` and update the `DOMAIN` and `EMAIL` environment variables
+3. Update the configuration in `docker-compose.yml`:
+   - Set your `DOMAIN` environment variable
+   - Set your `EMAIL` environment variable for Let's Encrypt notifications
 
 4. Place your website files in the `www` directory
 
@@ -43,15 +44,16 @@ This is a Docker-based setup for a secure Nginx web server with SSL support usin
    docker-compose up -d
    ```
 
-6. The first time you run the container, you'll need to obtain SSL certificates. Run:
-   ```bash
-   docker-compose exec webserver certbot --nginx -d your-domain.com --email your-email@example.com --agree-tos --non-interactive
-   ```
+The container will automatically:
+- Generate the Nginx configuration
+- Obtain SSL certificates if they don't exist
+- Set up HTTP to HTTPS redirection
+- Configure all security headers and optimizations
+- Set up daily certificate renewal via cron
 
 ## Directory Structure
 
 - `www/`: Your website files
-- `nginx/conf.d/`: Nginx configuration files
 - `certbot/conf/`: SSL certificates
 - `certbot/www/`: Let's Encrypt verification files
 
@@ -60,14 +62,8 @@ This is a Docker-based setup for a secure Nginx web server with SSL support usin
 - Automatic HTTP to HTTPS redirection
 - Modern SSL configuration (TLSv1.2 & TLSv1.3) with strong ciphers
 - OCSP Stapling for improved certificate validation
-- Comprehensive security headers:
+- Security headers:
   - Strict-Transport-Security (HSTS)
-  - X-Frame-Options (clickjacking protection)
-  - X-XSS-Protection (cross-site scripting protection)
-  - X-Content-Type-Options (MIME-type sniffing protection)
-  - Referrer-Policy (controls outgoing referrer information)
-  - Content-Security-Policy (restricts resource loading)
-  - Permissions-Policy (restricts browser feature usage)
 - Hidden file access protection
 - Request size limitations (10MB max)
 - Optimized timeout settings to prevent abuse
@@ -82,12 +78,10 @@ This is a Docker-based setup for a secure Nginx web server with SSL support usin
   - Disabled access logging for static files
   - TCP optimizations
   - Nginx open file cache configuration
-- Regular Nginx reloads for certificate updates
 
 ## Maintenance
 
-- SSL certificates will auto-renew
-- Nginx configuration is automatically reloaded every 6 hours
+- SSL certificates are automatically renewed daily via cron
 - Logs are available in the container at `/var/log/nginx/`
 - Optimized logging with buffer settings
 
@@ -111,4 +105,14 @@ This is a Docker-based setup for a secure Nginx web server with SSL support usin
 4. Check SSL certificate status:
    ```bash
    docker-compose exec webserver certbot certificates
+   ```
+
+5. Manually trigger certificate renewal:
+   ```bash
+   docker-compose exec webserver certbot renew
+   ```
+
+6. Check cron job status:
+   ```bash
+   docker-compose exec webserver crontab -l
    ``` 

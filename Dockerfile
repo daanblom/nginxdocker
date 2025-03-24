@@ -1,23 +1,18 @@
-FROM nginx:alpine
+FROM debian:bullseye-slim
 
-# Install certbot and its nginx plugin
-RUN apk add --no-cache certbot certbot-nginx
+# Install nginx and certbot
+RUN apt-get update && \
+    apt-get install -y nginx certbot python3-certbot-nginx && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
+# Copy startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
-# Copy custom nginx configuration
-COPY nginx/conf.d/app.conf /etc/nginx/conf.d/
-
-# Create directory for SSL certificates
-RUN mkdir -p /etc/letsencrypt
-
-# Create directory for web content
-RUN mkdir -p /var/www/html
-
-# Expose ports for HTTP and HTTPS
+# Expose ports
 EXPOSE 80 443
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s \
-  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1 
+  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
