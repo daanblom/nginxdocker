@@ -145,15 +145,6 @@ ln -sf /etc/nginx/sites-available/ssl.conf /etc/nginx/sites-enabled/
 echo "[$(date)] Testing final nginx configuration..."
 nginx -t
 
-# Set up certificate renewal cron job
-echo "[$(date)] Setting up certificate renewal cron job..."
-echo "0 0 * * * certbot renew --quiet && nginx -s reload" > /etc/cron.d/certbot-renew
-chmod 0644 /etc/cron.d/certbot-renew
-
-# Start cron service
-echo "[$(date)] Starting cron service..."
-service cron start
-
 # Start nginx in foreground
 echo "[$(date)] Starting nginx in HTTPS mode..."
 exec nginx -g 'daemon off;' 

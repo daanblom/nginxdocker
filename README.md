@@ -114,5 +114,5 @@ The container will automatically:
 
 6. Check cron job status:
    ```bash
-   docker-compose exec webserver crontab -l
+   docker-compose exec webserver cat /etc/cron.d/certbot
    ``` 
